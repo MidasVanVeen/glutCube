@@ -12,9 +12,8 @@ static int win_id;
 static int win_x, win_y;
 static int rotate_y;
 static int rotate_x;
-static int omx, omy, mx, my, oldmy, oldmx;
+static int omx, omy, mx, my;
 static int mouse_down[3];
-// static int omx, omy, mx, my;
 
 static void post_display(void);
 static void pre_display(void);
@@ -40,7 +39,6 @@ int main(int argc, char *argv[]) {
 static void motion_func(int x, int y) {
   mx = x;
   my = y;
-
 }
 
 static void mouse_func(int button, int state, int x, int y) {
@@ -59,22 +57,22 @@ static void key_func(unsigned char key, int x, int y) {
 
   case 'j':
   case 'J':
-    rotate_y += 3;
+    rotate_x += 3;
     break;
 
   case 'i':
   case 'I':
-    rotate_x += 3;
+    rotate_y += 3;
     break;
 
   case 'l':
   case 'L':
-    rotate_y -= 3;
+    rotate_x -= 3;
     break;
 
   case 'k':
   case 'K':
-    rotate_x -= 3;
+    rotate_y -= 3;
     break;
   }
 }
@@ -102,36 +100,49 @@ static void display_func(void) {
   glRotatef(rotate_x, 0.0, 1.0, 0.0);
 
   glBegin(GL_POLYGON);
-  glColor3f( 1.0, 0.0, 0.0 );     glVertex3f(  0.5, -0.5, -0.5 );      // P1 is red
-  glColor3f( 0.0, 1.0, 0.0 );     glVertex3f(  0.5,  0.5, -0.5 );      // P2 is green
-  glColor3f( 0.0, 0.0, 1.0 );     glVertex3f( -0.5,  0.5, -0.5 );      // P3 is blue
-  glColor3f( 1.0, 0.0, 1.0 );     glVertex3f( -0.5, -0.5, -0.5 );      // P4 is purple
+  glColor3f(1.0, 0.0, 0.0);
+  glVertex3f(0.5, -0.5, -0.5);
+  glColor3f(0.0, 1.0, 0.0);
+  glVertex3f(0.5, 0.5, -0.5);
+  glColor3f(0.0, 0.0, 1.0);
+  glVertex3f(-0.5, 0.5, -0.5);
+  glColor3f(1.0, 0.0, 1.0);
+  glVertex3f(-0.5, -0.5, -0.5);
   glEnd();
 
   // White side - BACK
   glBegin(GL_POLYGON);
-  glColor3f(1.0, 1.0, 1.0);
+  glColor3f(1.0, 0.0, 1.0);
   glVertex3f(0.5, -0.5, 0.5);
+  glColor3f(0.0, 0.0, 1.0);
   glVertex3f(0.5, 0.5, 0.5);
+  glColor3f(0.0, 1.0, 0.0);
   glVertex3f(-0.5, 0.5, 0.5);
+  glColor3f(1.0, 0.0, 0.0);
   glVertex3f(-0.5, -0.5, 0.5);
   glEnd();
 
   // Purple side - RIGHT
   glBegin(GL_POLYGON);
-  glColor3f(1.0, 0.0, 1.0);
+  glColor3f(1.0, 0.0, 0.0);
   glVertex3f(0.5, -0.5, -0.5);
+  glColor3f(0.0, 1.0, 0.0);
   glVertex3f(0.5, 0.5, -0.5);
+  glColor3f(0.0, 0.0, 1.0);
   glVertex3f(0.5, 0.5, 0.5);
+  glColor3f(1.0, 0.0, 1.0);
   glVertex3f(0.5, -0.5, 0.5);
   glEnd();
 
   // Green side - LEFT
   glBegin(GL_POLYGON);
-  glColor3f(0.0, 1.0, 0.0);
+  glColor3f(1.0, 0.0, 0.0);
   glVertex3f(-0.5, -0.5, 0.5);
+  glColor3f(0.0, 1.0, 0.0);
   glVertex3f(-0.5, 0.5, 0.5);
+  glColor3f(0.0, 0.0, 1.0);
   glVertex3f(-0.5, 0.5, -0.5);
+  glColor3f(1.0, 0.0, 1.0);
   glVertex3f(-0.5, -0.5, -0.5);
   glEnd();
 
@@ -139,8 +150,11 @@ static void display_func(void) {
   glBegin(GL_POLYGON);
   glColor3f(0.0, 0.0, 1.0);
   glVertex3f(0.5, 0.5, 0.5);
+  glColor3f(0.0, 1.0, 0.0);
   glVertex3f(0.5, 0.5, -0.5);
+  glColor3f(0.0, 0.0, 1.0);
   glVertex3f(-0.5, 0.5, -0.5);
+  glColor3f(0.0, 1.0, 0.0);
   glVertex3f(-0.5, 0.5, 0.5);
   glEnd();
 
@@ -148,8 +162,11 @@ static void display_func(void) {
   glBegin(GL_POLYGON);
   glColor3f(1.0, 0.0, 0.0);
   glVertex3f(0.5, -0.5, -0.5);
+  glColor3f(1.0, 0.0, 1.0);
   glVertex3f(0.5, -0.5, 0.5);
+  glColor3f(1.0, 0.0, 0.0);
   glVertex3f(-0.5, -0.5, 0.5);
+  glColor3f(1.0, 0.0, 1.0);
   glVertex3f(-0.5, -0.5, -0.5);
   glEnd();
 
@@ -159,7 +176,7 @@ static void display_func(void) {
 static void idle_func(void) {
   // update objects
 
-  if (mouse_down[0] == 1 && oldmx != mx) {
+  if (mouse_down[0] == 1) {
     rotate_y = -(my - omy);
     rotate_x = -(mx - omx);
   }
