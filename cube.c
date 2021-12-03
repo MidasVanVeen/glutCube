@@ -10,10 +10,10 @@
 
 static int win_id;
 static int win_x, win_y;
-static int rotate_y;
-static int rotate_x;
+static int rotate_y, lastrotate_y;
+static int rotate_x, lastrotate_x;
 static int omx, omy, mx, my;
-static int mouse_down[3];
+static int mouse_down[3], mouse_up[3];
 
 static void post_display(void);
 static void pre_display(void);
@@ -46,6 +46,7 @@ static void mouse_func(int button, int state, int x, int y) {
   omy = my = y;
 
   mouse_down[button] = state == GLUT_DOWN;
+  mouse_up[button] = state == GLUT_UP;
 }
 
 static void key_func(unsigned char key, int x, int y) {
@@ -176,9 +177,14 @@ static void display_func(void) {
 static void idle_func(void) {
   // update objects
 
+  if (mouse_up[0] == 1) {
+    lastrotate_y = rotate_y;
+    lastrotate_x = rotate_x;
+  }
+
   if (mouse_down[0] == 1) {
-    rotate_y = -(my - omy);
-    rotate_x = -(mx - omx);
+    rotate_y = lastrotate_y - (my - omy) / 2;
+    rotate_x = lastrotate_x - (mx - omx) / 2;
   }
 
   glutSetWindow(win_id);
@@ -214,4 +220,5 @@ static void open_glut_window(void) {
   glutReshapeFunc(reshape_func);
   glutIdleFunc(idle_func);
   glutDisplayFunc(display_func);
+  glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 }
