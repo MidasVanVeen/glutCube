@@ -14,6 +14,7 @@ static int rotate_y, lastrotate_y;
 static int rotate_x, lastrotate_x;
 static int omx, omy, mx, my;
 static int mouse_down[3], mouse_up[3];
+static int keystates[256];
 
 static void post_display(void);
 static void pre_display(void);
@@ -49,34 +50,9 @@ static void mouse_func(int button, int state, int x, int y) {
   mouse_up[button] = state == GLUT_UP;
 }
 
-static void key_func(unsigned char key, int x, int y) {
-  switch (key) {
-  case 'q':
-  case 'Q':
-    exit(0);
-    break;
+static void key_func(unsigned char key, int x, int y) { keystates[key] = 1; }
 
-  case 'j':
-  case 'J':
-    rotate_x += 3;
-    break;
-
-  case 'i':
-  case 'I':
-    rotate_y += 3;
-    break;
-
-  case 'l':
-  case 'L':
-    rotate_x -= 3;
-    break;
-
-  case 'k':
-  case 'K':
-    rotate_y -= 3;
-    break;
-  }
-}
+static void keyUp_func(unsigned char key, int x, int y) { keystates[key] = 0; }
 
 static void post_display(void) {
   glFlush();
@@ -96,7 +72,6 @@ static void display_func(void) {
   pre_display();
   glLoadIdentity();
 
-  // Rotate when user changes rotate_x and rotate_y
   glRotatef(rotate_y, 1.0, 0.0, 0.0);
   glRotatef(rotate_x, 0.0, 1.0, 0.0);
 
@@ -111,7 +86,6 @@ static void display_func(void) {
   glVertex3f(-0.5, -0.5, -0.5);
   glEnd();
 
-  // White side - BACK
   glBegin(GL_POLYGON);
   glColor3f(1.0, 0.0, 1.0);
   glVertex3f(0.5, -0.5, 0.5);
@@ -123,7 +97,6 @@ static void display_func(void) {
   glVertex3f(-0.5, -0.5, 0.5);
   glEnd();
 
-  // Purple side - RIGHT
   glBegin(GL_POLYGON);
   glColor3f(1.0, 0.0, 0.0);
   glVertex3f(0.5, -0.5, -0.5);
@@ -135,7 +108,6 @@ static void display_func(void) {
   glVertex3f(0.5, -0.5, 0.5);
   glEnd();
 
-  // Green side - LEFT
   glBegin(GL_POLYGON);
   glColor3f(1.0, 0.0, 0.0);
   glVertex3f(-0.5, -0.5, 0.5);
@@ -147,7 +119,6 @@ static void display_func(void) {
   glVertex3f(-0.5, -0.5, -0.5);
   glEnd();
 
-  // Blue side - TOP
   glBegin(GL_POLYGON);
   glColor3f(0.0, 0.0, 1.0);
   glVertex3f(0.5, 0.5, 0.5);
@@ -159,7 +130,6 @@ static void display_func(void) {
   glVertex3f(-0.5, 0.5, 0.5);
   glEnd();
 
-  // Red side - BOTTOM
   glBegin(GL_POLYGON);
   glColor3f(1.0, 0.0, 0.0);
   glVertex3f(0.5, -0.5, -0.5);
@@ -185,6 +155,19 @@ static void idle_func(void) {
   if (mouse_down[0] == 1) {
     rotate_y = lastrotate_y - (my - omy) / 2;
     rotate_x = lastrotate_x - (mx - omx) / 2;
+  }
+
+  if (keystates['w']) {
+    rotate_y += 1;
+  }
+  if (keystates['s']) {
+    rotate_y -= 1;
+  }
+  if (keystates['a']) {
+    rotate_x += 1;
+  }
+  if (keystates['d']) {
+    rotate_x -= 1;
   }
 
   glutSetWindow(win_id);
@@ -215,10 +198,10 @@ static void open_glut_window(void) {
   pre_display();
 
   glutKeyboardFunc(key_func);
+  glutKeyboardUpFunc(keyUp_func);
   glutMouseFunc(mouse_func);
   glutMotionFunc(motion_func);
   glutReshapeFunc(reshape_func);
   glutIdleFunc(idle_func);
   glutDisplayFunc(display_func);
-  glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 }
